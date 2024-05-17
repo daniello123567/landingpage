@@ -3,10 +3,12 @@ import waitlist_hammer from "../assets/waitlist_hammer.png";
 import { API_URL } from "../../config";
 import { Message } from "primereact/message";
 import { Dialog } from "primereact/dialog";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const Waitlist = () => {
 	const [email, setEmail] = useState("");
 	const [err, setErr] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 	const [showCongratsDialog, setShowCongratsDialog] = useState(false);
 
 	const handleSubmit = (e) => {
@@ -15,7 +17,7 @@ const Waitlist = () => {
 		e.preventDefault();
 		// Check if an email has been provided.
 		if (email.length === 0) return setErr("Please enter a valid email.");
-
+		setIsLoading(true);
 		fetch(API_URL + "/waitlist", {
 			method: "POST",
 			body: JSON.stringify({ email }),
@@ -43,6 +45,9 @@ const Waitlist = () => {
 			})
 			.catch((err) => {
 				setErr(err.message);
+			})
+			.finally(() => {
+				setIsLoading(false);
 			});
 	};
 	return (
@@ -98,9 +103,15 @@ const Waitlist = () => {
 						/>
 					</div>
 					<div className="w-full flex flex-col items-center mt-3 justify-center">
+						{isLoading && (
+							<ProgressSpinner
+								className="w-[40px] h-fit"
+								aria-label="Loading"
+							/>
+						)}
 						{err && <Message severity="error" text={err} />}
 						<button
-							className="px-12 text-white bg-neutral-700 py-2 rounded-lg text-sm mt-1 w-fit cursor-pointer duration-300 hover:bg-neutral-800 hover:shadow-xl "
+							className="px-12 text-white bg-neutral-700 py-2 rounded-lg text-sm mt-2 w-fit cursor-pointer duration-300 hover:bg-neutral-800 hover:shadow-xl "
 							type="submit">
 							Join the waitlist
 						</button>
